@@ -1,12 +1,16 @@
 import os
 import requests
 import logging
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import ollama
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
+
+@app.route('/')
+def index():
+    return send_from_directory('.', 'index.html')
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
