@@ -1,2 +1,14 @@
+[project]
+name = "indian-kanoon-chatbot"
+version = "0.1.0"
+description = "Legal chatbot using Indian Kanoon API and Ollama"
+requires-python = ">=3.8"
+dependencies = [
+    "flask>=3.0.0",
+    "flask-cors>=6.0.0",
+    "requests>=2.30.0",
+    "ollama>=0.3.0",
+]
+
 [tool.vercel]
 entrypoint = "frontend.app:app"
