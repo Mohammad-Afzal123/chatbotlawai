@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Law Chatbot</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            margin: 0; 
+            padding: 40px 20px; 
+            background: linear-gradient(135deg, #1a2a3a, #2a1a3a); 
+            color: #e0e0e0; 
+            line-height: 1.6;
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start; 
+            min-height: 100vh; 
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%; 
+            padding: 35px; 
+            background-color: rgba(30, 30, 30, 0.65); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            border-radius: 12px; 
+            animation: fadeInSlideUp 0.8s ease-out forwards;
+        }
+
+        h1 {
+            color: #ffffff; 
+            font-size: 2.2em;
+            margin-top: 0;
+            margin-bottom: 25px;
+            text-align: center; 
+            background: linear-gradient(45deg, #00bcd4, #e0e0e0, #00bcd4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInDown 0.6s ease-out 0.2s forwards;
+        }
+
+        h2 {
+            color: #cccccc; 
+            font-size: 1.6em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #333333; 
+            padding-bottom: 10px;
+            opacity: 0; 
+            animation: fadeInUp 0.5s ease-out 0.8s forwards;
+        }
+ 
+        .search-form {
+            display: flex;
+            gap: 10px; 
+            margin-bottom: 25px;
+            align-items: center; 
+            
+        }
+
+        input[type="text"] {
+            flex-grow: 1; 
+            padding: 12px 15px;
+            background-color: #252525; 
+            color: #e0e0e0; 
+            border: 1px solid #444444; 
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            opacity: 0; 
+            animation: fadeInUp 0.5s ease-out 0.4s forwards;
+        }
+
+        input[type="text"]:focus {
+            border-color: #00bcd4; 
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.25); 
+            outline: none; 
+        }
+
+        button {
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #00bcd4, #0097a7);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500; 
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            opacity: 0; 
+            animation: fadeInUp 0.5s ease-out 0.6s forwards;
+        }
+
+        button:hover {
+             background: linear-gradient(45deg, #0097a7, #00796b); 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
+        }
+
+        button:active {
+            background: linear-gradient(45deg, #00796b, #006054); 
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(0, 188, 212, 0.2);
+        }
+
+        pre {
+            background-color: #282c34; 
+            padding: 20px;
+            border: 1px solid #3c3c3c; 
+            border-radius: 6px; 
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; 
+            font-size: 0.95em;
+            line-height: 1.7;
+            color: #abb2bf; 
+            max-height: 400px; 
+            overflow-y: auto; 
+            opacity: 0; 
+            animation: fadeInUp 0.5s ease-out 1s forwards;
+        }
+
+        @keyframes fadeInSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading-dots::after {
+            content: ' .';
+            animation: loading-dots-animation 1.4s infinite;
+        }
+        @keyframes loading-dots-animation {
+            0%, 20% { content: ' .'; }
+            40% { content: ' ..'; }
+            60%, 100% { content: ' ...'; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Law Chatbot</h1>
+        <div class="search-form">
+            <input type="text" id="queryInput" placeholder="Enter your search query">
+            <button onclick="performSearch()">Search</button>
+            <button id="downloadPdfButton" onclick="downloadResultsAsPDF()">Download PDF</button>
+        </div>
+        <h2>Results:</h2>
+        <pre id="resultsOutput">Search results will appear here...</pre>
+    </div>
+
+    <script type="module">
+        async function performSearch() {
+            const query = document.getElementById('queryInput').value;
+            const resultsOutput = document.getElementById('resultsOutput'); 
+            resultsOutput.textContent = 'Loading...';
+
+            if (!query) {
+                resultsOutput.textContent = 'Please enter a search query.';
+                return;
+            }
+
+            try {
+                const searchResponse = await fetch(`http://127.0.0.1:5000/search?q=${encodeURIComponent(query)}`);
+                if (!searchResponse.ok) {
+                    throw new Error(`Failed to fetch search results: ${searchResponse.status} ${searchResponse.statusText}`);
+                }
+                const searchData = await searchResponse.json(); 
+                resultsOutput.textContent = searchData.analysis;
+
+            } catch (error) {
+                console.error('Operation failed:', error);
+                let errorMessage = `Operation failed: ${error.message}. `;
+                errorMessage += 'Ensure the Ollama server is running locally and the Flask backend is active. Check the browser console and backend logs for more details.';
+                resultsOutput.textContent = errorMessage;
+            }
+        }
+        window.performSearch = performSearch;
+
+        async function downloadResultsAsPDF() {
+            const queryInput = document.getElementById('queryInput');
+            const resultsOutput = document.getElementById('resultsOutput');
+
+            const query = queryInput.value;
+            const resultsText = resultsOutput.textContent;
+
+            const initialResultsContent = 'Search results will appear here...';
+            const loadingContent = 'Loading...';
+            const noQueryContent = 'Please enter a search query.';
+            const errorContentPrefix = 'Operation failed:';
+
+            if (resultsText === initialResultsContent ||
+                resultsText.startsWith(loadingContent) ||
+                resultsText === noQueryContent ||
+                resultsText.startsWith(errorContentPrefix)) {
+                alert('No valid results to download. Please perform a search or wait for results to load.');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            let yPosition = 20;
+            const leftMargin = 15;
+            const rightMargin = 15;
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const usableWidth = pageWidth - leftMargin - rightMargin;
+
+            doc.setFontSize(18);
+            doc.setFont("helvetica", "bold");
+            doc.text("Law Chatbot Search Report", pageWidth / 2, yPosition, { align: 'center' });
+            yPosition += 15;
+
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text("Search Query:", leftMargin, yPosition);
+            yPosition += 8;
+            
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            const queryToDisplay = query || "N/A"; 
+            let queryLines = doc.splitTextToSize(queryToDisplay, usableWidth);
+            doc.text(queryLines, leftMargin, yPosition);
+            yPosition += (queryLines.length * 7) + 10; 
+
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text("Results:", leftMargin, yPosition);
+            yPosition += 8;
+
+            doc.setFontSize(10);
+            doc.setFont("courier", "normal"); 
+            let resultLines = doc.splitTextToSize(resultsText, usableWidth);
+            resultLines.forEach(line => {
+                if (yPosition > doc.internal.pageSize.getHeight() - 20) { 
+                    doc.addPage();
+                    yPosition = 20; 
+                }
+                doc.text(line, leftMargin, yPosition);
+                yPosition += 6; 
+            });
+
+            doc.save('law_chatbot_report.pdf');
+        }
+        window.downloadResultsAsPDF = downloadResultsAsPDF;
+    </script>
+</body>
+</html>
